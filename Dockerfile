@@ -38,3 +38,4 @@ EXPOSE 80
 
 # Start
 CMD ["apache2-foreground"]
+RUN chmod +x /var/www/html/entrypoint.sh
