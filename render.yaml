@@ -1,9 +1,11 @@
 services:
   - type: web
-    name: kisan_mazdoor_union_trust
+    name: kisan-mazdoor-union-trust
     env: docker
-    plan: free
-    repo: https://github.com/pk917026-dot/kisan_mazdoor_union_trust
-    branch: main
-    rootDir: /
-    dockerCommand: ""
+    dockerfilePath: Dockerfile
+    envVars:
+      APP_ENV: production
+      APP_DEBUG: false
+      APP_URL: https://kisan-mazdoor-union-trust.onrender.com
+    buildCommand: "composer install --no-dev --optimize-autoloader"
+    startCommand: "php artisan migrate --force && php artisan serve --host 0.0.0.0 --port 10000"
