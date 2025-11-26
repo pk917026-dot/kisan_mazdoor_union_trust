@@ -1,32 +1,21 @@
 FROM php:8.2-apache
 
 RUN apt-get update && apt-get install -y \
-    unzip \
-    zip \
-    libpng-dev \
-    libjpeg-dev \
-    libfreetype6-dev \
-    libonig-dev \
-    libxml2-dev \
-    curl
+    libzip-dev zip unzip git curl \
+    && docker-php-ext-install pdo pdo_mysql mysqli zip
 
-RUN a2enmod rewrite
-
-COPY . /var/www/html/
+COPY . /var/www/html
 
 WORKDIR /var/www/html
 
-COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+RUN chown -R www-data:www-data /var/www/html \
+    && chmod -R 755 /var/www/html/storage \
+    && chmod -R 755 /var/www/html/bootstrap/cache
 
-RUN docker-php-ext-install pdo pdo_mysql gd
+COPY ./public /var/www/html/public
 
-RUN composer install --no-dev --optimize-autoloader
+RUN sed -i 's!/var/www/html!/var/www/html/public!g' /etc/apache2/sites-enabled/000-default.conf
 
-RUN chmod -R 775 storage bootstrap/cache
-RUN chown -R www-data:www-data storage bootstrap/cache
-
-RUN chmod +x /var/www/html/entrypoint.sh
+RUN a2enmod rewrite
 
 EXPOSE 80
-
-CMD ["./entrypoint.sh"]
