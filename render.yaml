@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: kisan_mazdoor_union_trust
+    env: docker
+    plan: free
+    repo: https://github.com/pk917026-dot/kisan_mazdoor_union_trust
+    branch: main
+    rootDir: /
+    dockerCommand: ""
