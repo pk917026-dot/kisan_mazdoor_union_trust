@@ -3,9 +3,5 @@ services:
     name: kisan-mazdoor-union-trust
     env: docker
     dockerfilePath: Dockerfile
-    envVars:
-      APP_ENV: production
-      APP_DEBUG: false
-      APP_URL: https://kisan-mazdoor-union-trust.onrender.com
-    buildCommand: "composer install --no-dev --optimize-autoloader"
-    startCommand: "php artisan migrate --force && php artisan serve --host 0.0.0.0 --port 10000"
+    buildCommand: ""
+    startCommand: "apache2-foreground"
