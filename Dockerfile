@@ -1,5 +1,6 @@
 FROM php:8.2-apache
 
+# Install system dependencies
 RUN apt-get update && apt-get install -y \
     unzip \
     zip \
@@ -10,25 +11,30 @@ RUN apt-get update && apt-get install -y \
     libxml2-dev \
     curl
 
-RUN docker-php-ext-install pdo pdo_mysql gd
-
+# Enable Apache rewrite
 RUN a2enmod rewrite
 
-COPY . /var/www/html
+# Copy project
+COPY . /var/www/html/
 
+# Set working directory
 WORKDIR /var/www/html
 
-RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/bin --filename=composer
+# Install Composer
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-RUN composer install --no-dev --prefer-dist --optimize-autoloader
+# Install PHP extensions
+RUN docker-php-ext-install pdo pdo_mysql gd
 
-ENV APACHE_DOCUMENT_ROOT=/var/www/html/public
+# Install Laravel dependencies
+RUN composer install --no-dev --optimize-autoloader
 
-RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf
-RUN sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf
-
+# Give permissions
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
+RUN chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
 
+# Expose port
 EXPOSE 80
 
+# Start
 CMD ["apache2-foreground"]
